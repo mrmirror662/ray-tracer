@@ -21,7 +21,7 @@ void ppm(frameBuff &buff)
     for (int i = 0; i < buff.data.size(); i++)
         os << buff[i];
 }
-const int w = 1000, h = 1000;
+const int w = 500, h = 500;
 int main()
 {
     using namespace std;
@@ -30,7 +30,7 @@ int main()
     cam.w = w;
     cam.h = h;
 
-    triangle t({10, 0, 0.f}, {-10.f, 0, -10.f}, {0, 30.f, -10.f}, {1.f, 0.f, 0.f});
+    triangle t({10., 0., 0.f}, {0.f, 0.f, 500.f}, {0, 500.f, 250.f}, {1.f, 0.f, 0.f});
     cam.resolutionFactor = 1;
     rayTracer::initRays(cam);
     rayTracer rt;

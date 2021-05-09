@@ -17,12 +17,12 @@ bool ray::doesIntersect(const triangle &tri)
     auto e0 = tri.v2 - tri.v1;
     auto vp0 = pos - tri.v1;
     auto c = cross(e0, vp0);
-    if (dot(norm, vp0) < 0.f)
+    if (dot(norm, c) < 0.f)
         return false;
     auto e1 = tri.v3 - tri.v2;
     auto vp1 = pos - tri.v2;
-    c = cross(e0, vp1);
-    if (dot(norm, vp1) < 0.f)
+    c = cross(e1, vp1);
+    if (dot(norm, c) < 0.f)
         return false;
     auto e2 = tri.v1 - tri.v3;
     auto vp2 = pos - tri.v3;

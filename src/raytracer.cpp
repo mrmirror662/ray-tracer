@@ -41,7 +41,7 @@ glm::vec3 rayTracer::trace(ray &r, std::vector<triangle> &tris)
     auto triHit = tris[max.index];
     auto norm = triHit.normal;
     auto bright = abs(dot(raytointer, norm));
-    auto col = bright * triHit.col;
+    auto col = triHit.col;
     return col;
 }
 frameBuff rayTracer::trace(const camera &cam, std::vector<triangle> &tris)
@@ -67,9 +67,9 @@ void rayTracer::initRays(camera &cam)
         {
             // auto index = cam.w * r + c;
             ray ra;
-            ra.origin = cam.pos + glm::vec3(c, r, 0.f);
+            ra.origin = cam.pos + glm::vec3(0.f, r, c);
             float dx = c / cam.h;
-            ra.dir = {dx, dy, -1.f};
+            ra.dir = {1.f, 0, 0};
 
             cam.rays.push_back(ra);
         }
