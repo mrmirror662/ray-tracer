@@ -1,5 +1,6 @@
 #include "raytracer.h"
 #include <iostream>
+#define CLIP_DISTANCE 10000.f
 static bool operator>(glm::vec3 &a, glm::vec3 &b)
 {
     return (glm::dot(a, a) > glm::dot(b, b));
@@ -31,14 +32,14 @@ glm::vec3 rayTracer::trace(ray &r, std::vector<triangle> &tris)
     {
         return vec3(0.f, 0.f, 0.f);
     }
-    pair max = {{0.0f, 0.0f, 0.0f}, 0};
+    pair min = {vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
     for (auto intersection : intersections)
     {
-        if (intersection.pos > max.pos)
-            max = intersection;
+        if (intersection.pos < min.pos)
+            min = intersection;
     }
-    auto raytointer = max.pos - r.origin;
-    auto triHit = tris[max.index];
+    auto raytointer = min.pos - r.origin;
+    auto triHit = tris[min.index];
     auto norm = triHit.normal;
     auto bright = abs(dot(raytointer, norm));
     auto col = triHit.col;
@@ -60,9 +61,9 @@ frameBuff rayTracer::trace(const camera &cam, std::vector<triangle> &tris)
 
 void rayTracer::initRays(camera &cam)
 {
-    for (float r = 0; r < cam.h; r += 1)
+    for (float r = 0; r < cam.h; r += 1.f)
     {
-        for (float c = 0; c < cam.w; c += 1)
+        for (float c = 0; c < cam.w; c += 1.f)
         {
             // auto index = cam.w * r + c;
             ray ra;
