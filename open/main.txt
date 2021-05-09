@@ -1,0 +1,49 @@
+
+
+#include "glu.h"
+#include "buff_view.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#include <unistd.h>
+int main()
+{
+    auto window = initGLW(1000, 1000);
+    int w, h, c;
+    auto texData = stbi_load("pic.jpg", &w, &h, &c, 0);
+    frameBuff fb = {texData, w, h, c};
+    view v;
+    v.loadBuff(fb);
+    /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window))
+    {
+        /* Render here */
+        glClear(GL_COLOR_BUFFER_BIT);
+        v.display();
+        for (int i = 3; i < (w * c) - 3; i += 1)
+        {
+            for (int j = 3; j < h - 3; j += 1)
+            {
+                auto in = i + j * (w * c);
+                auto in1 = (i - 3) + (j) * (w * c);
+                auto in2 = (i + 3) + (j) * (w * c);
+                auto in3 = (i) + (j + 3) * (w * c);
+                auto in4 = (i) + (j - 3) * (w * c);
+                auto in5 = (i - 3) + (j - 3) * (w * c);
+                auto in6 = (i + 3) + (j - 3) * (w * c);
+                auto in7 = (i + 3) + (j + 3) * (w * c);
+                auto in8 = (i - 3) + (j + 3) * (w * c);
+
+                texData[in] = (texData[in] + texData[in1] + texData[in2] + texData[in3] + texData[in4] + texData[in5] + texData[in6] + texData[in7] + texData[in8]) / 9;
+            }
+        }
+        v.loadBuff({texData, w, h, c});
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+        sleep(0.1);
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+    glfwTerminate();
+    return 0;
+}

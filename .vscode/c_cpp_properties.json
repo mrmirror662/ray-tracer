@@ -1,0 +1,24 @@
+{
+    "env": {
+        "myDefaultIncludePath": [
+            "${workspaceFolder}/includes/"
+        ],
+        "imgui": [
+            "${workspaceFolder}/imgui/"
+        ],
+        "myCompilerPath": "/usr/local/bin/gcc-7"
+    },
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${myDefaultIncludePath}",
+                "${imgui}"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang-11",
+            "intelliSenseMode": "macos-gcc-x64"
+        }
+    ],
+    "version": 4
+}
