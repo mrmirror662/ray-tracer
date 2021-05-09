@@ -30,7 +30,7 @@ int main()
     cam.w = w;
     cam.h = h;
 
-    triangle t({10., 0., 0.f}, {0.f, 0.f, 500.f}, {0, 500.f, 250.f}, {1.f, 0.f, 0.f});
+    triangle t({100., 100., 0.f}, {100.f, 100.f, 500.f}, {100, 400.f, 250.f}, {1.f, 0.f, 0.f});
     cam.resolutionFactor = 1;
     rayTracer::initRays(cam);
     rayTracer rt;

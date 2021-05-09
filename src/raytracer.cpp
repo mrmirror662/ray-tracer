@@ -60,16 +60,15 @@ frameBuff rayTracer::trace(const camera &cam, std::vector<triangle> &tris)
 
 void rayTracer::initRays(camera &cam)
 {
-    for (float r = 0; r < cam.h; r += 1 / cam.resolutionFactor)
+    for (float r = 0; r < cam.h; r += 1)
     {
-        float dy = r / cam.h;
-        for (float c = 0; c < cam.w; c += 1 / cam.resolutionFactor)
+        for (float c = 0; c < cam.w; c += 1)
         {
             // auto index = cam.w * r + c;
             ray ra;
             ra.origin = cam.pos + glm::vec3(0.f, r, c);
-            float dx = c / cam.h;
-            ra.dir = {1.f, 0, 0};
+            ra.dir = {1.f, 0.f, 2 * (c / cam.w - 0.5)};
+            glm::normalize(ra.dir);
 
             cam.rays.push_back(ra);
         }
