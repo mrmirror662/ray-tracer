@@ -76,6 +76,7 @@ OBJECTS := \
 	$(OBJDIR)/main1.o \
 	$(OBJDIR)/ray.o \
 	$(OBJDIR)/raytracer.o \
+	$(OBJDIR)/shape.o \
 
 RESOURCES := \
 
@@ -165,6 +166,9 @@ $(OBJDIR)/ray.o: src/ray.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/raytracer.o: src/raytracer.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/shape.o: src/shape.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

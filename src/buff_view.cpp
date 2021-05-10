@@ -16,7 +16,7 @@ view::view()
     pid = loadShaders("shader/vert.sl", "shader/frag.sl");
     glUseProgram(pid);
 }
-void view::loadBuff(frameBuff buff)
+void view::loadBuff(frameBuff &buff)
 {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, buff.w, buff.h, 0, GL_RGB, GL_UNSIGNED_BYTE, buff.data.data());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

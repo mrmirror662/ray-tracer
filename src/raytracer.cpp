@@ -1,5 +1,7 @@
 #include "raytracer.h"
 #include <iostream>
+#include "imgui.h"
+
 #define CLIP_DISTANCE 10000.f
 static bool operator>(glm::vec3 &a, glm::vec3 &b)
 {
@@ -39,10 +41,12 @@ glm::vec3 rayTracer::trace(ray &r, std::vector<triangle> &tris)
             min = intersection;
     }
     auto raytointer = min.pos - r.origin;
+    raytointer = glm::normalize(raytointer);
     auto triHit = tris[min.index];
-    auto norm = triHit.normal;
+    auto norm = glm::normalize(triHit.normal);
     auto bright = abs(dot(raytointer, norm));
-    auto col = triHit.col;
+    // ImGui::Text("bright:%f", bright);
+    auto col = bright * triHit.col;
     return col;
 }
 frameBuff rayTracer::trace(const camera &cam, std::vector<triangle> &tris)
@@ -61,19 +65,22 @@ frameBuff rayTracer::trace(const camera &cam, std::vector<triangle> &tris)
 
 void rayTracer::initRays(camera &cam)
 {
+    std::vector<ray> rays;
     for (float r = 0; r < cam.h; r += 1.f)
     {
+        float dy = 2 * (r / cam.h - 0.5);
         for (float c = 0; c < cam.w; c += 1.f)
         {
             // auto index = cam.w * r + c;
             ray ra;
+            float dz = 2 * (c / cam.w - 0.5);
             ra.origin = cam.pos + glm::vec3(0.f, r, c);
-            ra.dir = {1.f, 0.f, 2 * (c / cam.w - 0.5)};
-            glm::normalize(ra.dir);
-
-            cam.rays.push_back(ra);
+            ra.dir = {1.f, dy, dz};
+            ra.dir = glm::normalize(ra.dir);
+            rays.push_back(ra);
         }
     }
+    cam.rays = std::move(rays);
 }
 void rayTracer::updateCam(camera &cam)
 {

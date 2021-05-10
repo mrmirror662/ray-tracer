@@ -22,6 +22,6 @@ private:
 
 public:
     view();
-    void loadBuff(frameBuff buff);
+    void loadBuff(frameBuff &buff);
     void display();
 };

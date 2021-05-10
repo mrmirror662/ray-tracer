@@ -11,6 +11,7 @@ private:
 public:
     std::vector<unsigned char> data;
     frameBuff(std::vector<unsigned char> &other, int w, int h, int c) : w(w), h(h), c(c) { data = other; }
+    frameBuff(){};
     friend view;
     inline int getW() { return w; };
     inline int getH() { return h; };
