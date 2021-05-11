@@ -5,6 +5,7 @@ workspace "raytracer"
 project "raytracer"
     kind "WindowedApp"
     language "C++"
+    cppdialect "C++17"
     targetdir "bin/%{cfg.buildcfg}"
     files {"src/**.cpp","imgui/**.cpp"}
     includedirs {"includes/","imgui/"}

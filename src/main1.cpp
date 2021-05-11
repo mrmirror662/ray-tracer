@@ -21,13 +21,13 @@ void ppm(frameBuff &buff)
     for (int i = 0; i < buff.data.size(); i++)
         os << buff[i];
 }
-const int w = 100, h = 100;
+const int w = 500, h = 500;
 const int windw = 500, windh = 500;
 int main()
 {
     using namespace std;
     camera cam;
-    cam.pos = {-500, 0, 0};
+    cam.pos = {-1000, -1000, 0};
     cam.w = w;
     cam.h = h;
 
@@ -35,12 +35,17 @@ int main()
     cam.resolutionFactor = 1;
     rayTracer::initRays(cam);
     rayTracer rt;
-    std::vector<triangle> ts;
-    ts.push_back({{350., 100., 100.f}, {350.f, 100.f, 500.f}, {700.f, 400.f, 350.f}, {1.f, 0.f, 0.f}});
-    // ts.push_back({{100., 100., 0.f}, {100.f, 100.f, 500.f}, {100, 400.f, 250.f}, {1.f, 1.f, 0.f}});
     mesh deer;
     deer.loadFromObj("asset/deer.obj");
+    glm::mat4 trans(1.0f);
 
+    trans = glm::rotate(trans, 3.1415f, glm::vec3(0.f, 0.f, 0.f));
+    for (auto &t : deer.tris)
+    {
+        // t.v1 = trans * glm::vec4(t.v1, 1.f);
+        // t.v2 = trans * glm::vec4(t.v2, 1.f);
+        // t.v3 = trans * glm::vec4(t.v3, 1.f);
+    }
     auto window = initGLW(windw, windh);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -78,9 +83,10 @@ int main()
 
         if (hd)
         {
-            cam.h = 500;
-            cam.w = 500;
+            cam.h = 200;
+            cam.w = 200;
             cam.c = 3;
+            hd = false;
             rayTracer::initRays(cam);
         }
         ImGui::End();

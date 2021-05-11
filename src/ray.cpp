@@ -32,7 +32,7 @@ bool ray::doesIntersect(const triangle &tri)
     return true;
 }
 //to be called after doesIntersect (no error checks)
-glm::vec3 ray::getIntersect(const triangle &tri)
+std::tuple<float, glm::vec3> ray::getIntersect(const triangle &tri)
 {
     using namespace glm;
     auto norm = tri.normal;
@@ -42,5 +42,5 @@ glm::vec3 ray::getIntersect(const triangle &tri)
 
     auto pos = origin + dir * t;
 
-    return pos;
+    return {t, pos};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <tuple>
 #include "shape.h"
 class ray
 {
@@ -8,6 +9,6 @@ public:
     ray(glm::vec3 o, glm::vec3 d) : origin(o), dir(d){};
     ray(){};
     bool doesIntersect(const triangle &);
-    glm::vec3 getIntersect(const triangle &);
+    std::tuple<float, glm::vec3> getIntersect(const triangle &);
     glm::vec3 doesIntersect(mesh &);
 };
