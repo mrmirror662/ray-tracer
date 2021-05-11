@@ -1,10 +1,10 @@
 {
     "env": {
         "myDefaultIncludePath": [
-            "${workspaceFolder}/includes/"
+            "${workspaceFolder}/ray-tracer/source/includes/"
         ],
         "imgui": [
-            "${workspaceFolder}/imgui/"
+            "${workspaceFolder}/ray-tracer/source/imgui/"
         ],
         "myCompilerPath": "/usr/local/bin/gcc-7"
     },

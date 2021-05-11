@@ -12,8 +12,8 @@ endif
 
 ifeq ($(config),debug)
   RESCOMP = windres
-  TARGETDIR = bin/debug
-  TARGET = $(TARGETDIR)/raytracer
+  TARGETDIR = build/lib/debug
+  TARGET = $(TARGETDIR)/libraytracer.a
   OBJDIR = obj/debug
   DEFINES += -DDEBUG
   INCLUDES += -Iincludes -Iimgui
@@ -25,7 +25,7 @@ ifeq ($(config),debug)
   LIBS += -lglfw -lGLU -lGL -lGLEW
   LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS)
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS
@@ -39,8 +39,8 @@ endif
 
 ifeq ($(config),release)
   RESCOMP = windres
-  TARGETDIR = bin/release
-  TARGET = $(TARGETDIR)/raytracer
+  TARGETDIR = build/lib/release
+  TARGET = $(TARGETDIR)/libraytracer.a
   OBJDIR = obj/release
   DEFINES += -DNDEBUG
   INCLUDES += -Iincludes -Iimgui
@@ -52,7 +52,7 @@ ifeq ($(config),release)
   LIBS += -lglfw -lGLU -lGL -lGLEW
   LDDEPS +=
   ALL_LDFLAGS += $(LDFLAGS) -s
-  LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
+  LINKCMD = $(AR) -rcs "$@" $(OBJECTS)
   define PREBUILDCMDS
   endef
   define PRELINKCMDS

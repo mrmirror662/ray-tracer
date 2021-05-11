@@ -1,16 +1,14 @@
 workspace "raytracer"
     configurations {"debug","release"}
-
-    
-project "raytracer"
+project "app"
     kind "WindowedApp"
     language "C++"
     cppdialect "C++17"
-    targetdir "bin/%{cfg.buildcfg}"
-    files {"src/**.cpp","imgui/**.cpp"}
-    includedirs {"includes/","imgui/"}
-    links {"glfw","GLU","GL","GLEW"}
-    
+    targetdir ""
+    files {"app.cpp"}
+    includedirs {"ray-tracer/source/includes/","ray-tracer/source/imgui/"}
+    libdirs {"ray-tracer/lib/%{cfg.buildcfg}"}
+    links{"raytracer","glfw","GLU","GL","GLEW"}
     filter "configurations:debug"
         defines{"DEBUG"}
         symbols "On"
@@ -18,4 +16,3 @@ project "raytracer"
     filter "configurations:release"
         defines{"NDEBUG"}
         optimize "On"
-    
