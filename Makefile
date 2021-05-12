@@ -9,28 +9,37 @@ ifndef verbose
 endif
 
 ifeq ($(config),debug)
+  raytracer_config = debug
   app_config = debug
 
 else ifeq ($(config),release)
+  raytracer_config = release
   app_config = release
 
 else
   $(error "invalid configuration $(config)")
 endif
 
-PROJECTS := app
+PROJECTS := raytracer app
 
 .PHONY: all clean help $(PROJECTS) 
 
 all: $(PROJECTS)
 
-app:
+raytracer:
+ifneq (,$(raytracer_config))
+	@echo "==== Building raytracer ($(raytracer_config)) ===="
+	@${MAKE} --no-print-directory -C raytracer -f Makefile config=$(raytracer_config)
+endif
+
+app: raytracer
 ifneq (,$(app_config))
 	@echo "==== Building app ($(app_config)) ===="
 	@${MAKE} --no-print-directory -C . -f app.make config=$(app_config)
 endif
 
 clean:
+	@${MAKE} --no-print-directory -C raytracer -f Makefile clean
 	@${MAKE} --no-print-directory -C . -f app.make clean
 
 help:
@@ -43,6 +52,7 @@ help:
 	@echo "TARGETS:"
 	@echo "   all (default)"
 	@echo "   clean"
+	@echo "   raytracer"
 	@echo "   app"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

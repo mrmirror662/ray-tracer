@@ -21,12 +21,14 @@ endif
 RESCOMP = windres
 TARGETDIR = .
 TARGET = $(TARGETDIR)/app
-INCLUDES += -Iray-tracer/source/includes -Iray-tracer/source/imgui
+DEFINES +=
+INCLUDES += -Iraytracer/source/includes -Iraytracer/source/imgui
 FORCE_INCLUDE +=
 ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
+ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS)
+ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -std=c++17
 ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-LIBS += -lraytracer -lglfw -lGLU -lGL -lGLEW
-LDDEPS +=
+ALL_LDFLAGS += $(LDFLAGS) -s
 LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
 define PREBUILDCMDS
 endef
@@ -37,17 +39,13 @@ endef
 
 ifeq ($(config),debug)
 OBJDIR = obj/debug
-DEFINES += -DDEBUG
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++17
-ALL_LDFLAGS += $(LDFLAGS) -Lray-tracer/lib/debug
+LIBS += raytracer/lib/debug/libraytracer.a -lGL -lglfw -lGLEW -lGLU -lpthread
+LDDEPS += raytracer/lib/debug/libraytracer.a
 
 else ifeq ($(config),release)
 OBJDIR = obj/release
-DEFINES += -DNDEBUG
-ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2
-ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -O2 -std=c++17
-ALL_LDFLAGS += $(LDFLAGS) -Lray-tracer/lib/release -s
+LIBS += raytracer/lib/release/libraytracer.a -lGL -lglfw -lGLEW -lGLU -lpthread
+LDDEPS += raytracer/lib/release/libraytracer.a
 
 endif
 
