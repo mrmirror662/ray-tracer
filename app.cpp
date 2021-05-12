@@ -8,6 +8,21 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <glm/gtc/matrix_transform.hpp>
+#include <chrono>
+#include <mutex>
+class Timer
+{
+private:
+    std::chrono::_V2::system_clock::time_point m_StartTime;
+
+public:
+    void Start() { m_StartTime = std::chrono::high_resolution_clock::now(); };
+    float GetDuration()
+    {
+        std::chrono::duration<float> duration = std::chrono::high_resolution_clock::now() - m_StartTime;
+        return duration.count();
+    }
+};
 void ppm(frameBuff &buff)
 {
     std::ofstream os;
@@ -27,7 +42,7 @@ int main()
 {
     using namespace std;
     camera cam;
-    cam.pos = {-1000, -1000, 0};
+    cam.pos = {-1000, 300, 0};
     cam.w = w;
     cam.h = h;
 
@@ -53,14 +68,26 @@ int main()
     ImGui_ImplOpenGL3_Init();
     int count = 0;
     bool hd = false;
+    std::mutex m;
 
+    frameBuff buff(cam.w * cam.resolutionFactor, cam.h * cam.resolutionFactor, cam.c);
+
+    int buffWidth = buff.getW();
+    int buffHeight = buff.getH();
+
+    std::thread rt_thread([](camera *cam, mesh *deer, frameBuff *buff) {
+        auto threads = rayTracer::trace_tris(cam, &(deer->tris), buff);
+        for (int i = 0; i < threads.size(); i++)
+        {
+            threads[i].join();
+        }
+    },
+                          &cam, &deer, &buff);
     while (!glfwWindowShouldClose(window))
     {
-        std::cout << "count:" << count << '\n';
+
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
-        frameBuff buff;
-        buff = rt.trace(cam, deer.tris);
 
         glPixelZoom(windw / cam.w, windh / cam.h);
         glDrawPixels(buff.getW(), buff.getH(), GL_RGB, GL_UNSIGNED_BYTE, (void *)buff.data.data());

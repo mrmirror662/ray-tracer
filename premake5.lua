@@ -1,14 +1,17 @@
 workspace "raytracer"
     configurations {"debug","release"}
+    dofileopt "raytracer/premake5.lua"
+
+-- dependencies 
 project "app"
     kind "WindowedApp"
     language "C++"
     cppdialect "C++17"
     targetdir ""
     files {"app.cpp"}
-    includedirs {"ray-tracer/source/includes/","ray-tracer/source/imgui/"}
-    libdirs {"ray-tracer/lib/%{cfg.buildcfg}"}
-    links{"raytracer","glfw","GLU","GL","GLEW"}
+    includedirs {"raytracer/source/includes","raytracer/source/imgui"  }
+    links{"raytracer","GL","glfw","GLEW","GLU","pthread"}
+    include "raytracer/"
     filter "configurations:debug"
         defines{"DEBUG"}
         symbols "On"

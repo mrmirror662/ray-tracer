@@ -9,7 +9,7 @@ project "raytracer"
     targetdir "lib/%{cfg.buildcfg}"
     files {"source/src/**.cpp","source/imgui/**.cpp"}
     includedirs {"source/includes/","source/imgui/"}
-    links {"glfw","GLU","GL","GLEW"}
+    links {"glfw","GLU","GL","GLEW","pthread"}
     
     filter "configurations:debug"
         defines{"DEBUG"}

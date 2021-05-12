@@ -23,7 +23,7 @@ bool mesh::loadFromObj(std::string filep)
             glm::vec3 vert;
             ss >> vert.x >> vert.y >> vert.z;
             vert.x *= -1;
-            vert.y *= -1;
+            vert.y *= 1;
             // vert.z *= -1;
             temp.push_back(vert);
         }
