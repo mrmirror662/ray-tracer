@@ -10,9 +10,9 @@ project "raytracer"
     files {"source/src/**.cpp","source/imgui/**.cpp"}
     includedirs {"source/includes/","source/imgui/"}
     links {"glfw","GLU","GL","GLEW","pthread"}
-    
     filter "configurations:debug"
         defines{"DEBUG"}
+        linkoptions "-g"
         symbols "On"
 
     filter "configurations:release"

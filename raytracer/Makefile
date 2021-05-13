@@ -40,7 +40,7 @@ OBJDIR = obj/debug
 DEFINES += -DDEBUG
 ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -g
 ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CPPFLAGS) -g -std=c++17
-ALL_LDFLAGS += $(LDFLAGS)
+ALL_LDFLAGS += $(LDFLAGS) -g
 
 else ifeq ($(config),release)
 TARGETDIR = lib/release

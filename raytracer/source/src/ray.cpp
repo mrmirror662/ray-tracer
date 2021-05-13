@@ -1,9 +1,9 @@
 #include "ray.h"
 #include <glm/glm.hpp>
 #include <iostream>
-#define STAND
+#define NSTAND
 
-const float kEpsilon = 1e-8;
+const double kEpsilon = 1e-2;
 bool ray::doesIntersect(const triangle &tri, float &f_t, glm::vec3 &f_pos)
 {
     using namespace glm;
@@ -43,11 +43,11 @@ bool ray::doesIntersect(const triangle &tri, float &f_t, glm::vec3 &f_pos)
     vec3 pvec = cross(dir, v0v2);
     float det = dot(v0v1, pvec);
 
-    if ((double)fabs(det) < (double)kEpsilon)
+    if ((double)det > -kEpsilon && (double)det < kEpsilon)
     {
         return false;
     }
-    float invDet = 1 / det;
+    double invDet = 1 / (double)det;
     vec3 tvec = origin - tri.v1;
     float u, v;
     u = dot(tvec, pvec) * invDet;
@@ -57,14 +57,19 @@ bool ray::doesIntersect(const triangle &tri, float &f_t, glm::vec3 &f_pos)
     }
     vec3 qvec = cross(tvec, v0v1);
     v = dot(dir, qvec) * invDet;
-    if ((double)v < (double)0.f || (double)v > (double)1.f)
+    if ((double)v < (double)0.f || (double)u + v > (double)1.f)
     {
         return false;
     }
     f_t = dot(v0v2, qvec) * invDet;
     f_pos = origin + dir * f_t;
 
-    return true;
+    if ((double)f_t > (double)kEpsilon)
+    { // Ray intersection
+        return true;
+    }
+
+    return false;
 #endif
 }
 /* 

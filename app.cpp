@@ -50,16 +50,17 @@ int main()
     cam.resolutionFactor = 1;
     rayTracer::initRays(cam);
     rayTracer rt;
-    mesh deer;
-    deer.loadFromObj("asset/deer.obj");
-    glm::mat4 trans(1.0f);
+    mesh deer1;
+    mesh deer2;
 
-    trans = glm::rotate(trans, 3.1415f, glm::vec3(0.f, 0.f, 0.f));
-    for (auto &t : deer.tris)
+    deer1.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
+    deer2.loadFromObj("asset/deer.obj", {0.f, 1.f, 0.f});
+    for (auto &t : deer2.tris)
     {
-        // t.v1 = trans * glm::vec4(t.v1, 1.f);
-        // t.v2 = trans * glm::vec4(t.v2, 1.f);
-        // t.v3 = trans * glm::vec4(t.v3, 1.f);
+        glm::vec3 offset = {0.f, 0.f, 750.f};
+        t.v1 += offset;
+        t.v2 += offset;
+        t.v3 += offset;
     }
     auto window = initGLW(windw, windh);
     IMGUI_CHECKVERSION();
@@ -69,20 +70,22 @@ int main()
     int count = 0;
     bool hd = false;
     std::mutex m;
-
+    std::vector<mesh> meshes;
+    meshes.push_back(deer1);
+    meshes.push_back(deer2);
     frameBuff buff(cam.w * cam.resolutionFactor, cam.h * cam.resolutionFactor, cam.c);
 
     int buffWidth = buff.getW();
     int buffHeight = buff.getH();
 
-    std::thread rt_thread([](camera *cam, mesh *deer, frameBuff *buff) {
-        auto threads = rayTracer::trace_tris(cam, &(deer->tris), buff);
+    std::thread rt_thread([](camera *cam, std::vector<mesh> *meshes, frameBuff *buff) {
+        auto threads = rayTracer::trace_tris(cam, meshes, buff);
         for (int i = 0; i < threads.size(); i++)
         {
             threads[i].join();
         }
     },
-                          &cam, &deer, &buff);
+                          &cam, &meshes, &buff);
     while (!glfwWindowShouldClose(window))
     {
 

@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <unistd.h>
-bool mesh::loadFromObj(std::string filep)
+bool mesh::loadFromObj(std::string filep, glm::vec3 col)
 {
     std::ifstream read;
     read.open(filep);
@@ -36,7 +36,7 @@ bool mesh::loadFromObj(std::string filep)
             {
                 ss >> index[i] >> SLASH >> INT;
             }
-            tris.push_back({temp[index[0] - 1], temp[index[1] - 1], temp[index[2] - 1], {1., 1., 1.}});
+            tris.push_back({temp[index[0] - 1], temp[index[1] - 1], temp[index[2] - 1], col});
         }
     }
     return true;

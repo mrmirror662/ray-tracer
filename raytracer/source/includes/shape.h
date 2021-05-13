@@ -23,5 +23,5 @@ struct triangle
 struct mesh
 {
     std::vector<triangle> tris;
-    bool loadFromObj(std::string filePath);
+    bool loadFromObj(std::string filePath, glm::vec3 col);
 };
