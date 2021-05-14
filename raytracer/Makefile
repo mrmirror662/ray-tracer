@@ -74,6 +74,7 @@ GENERATED += $(OBJDIR)/imgui_widgets.o
 GENERATED += $(OBJDIR)/ray.o
 GENERATED += $(OBJDIR)/raytracer.o
 GENERATED += $(OBJDIR)/shape.o
+GENERATED += $(OBJDIR)/skybox.o
 OBJECTS += $(OBJDIR)/buff_view.o
 OBJECTS += $(OBJDIR)/glu.o
 OBJECTS += $(OBJDIR)/imgui.o
@@ -85,6 +86,7 @@ OBJECTS += $(OBJDIR)/imgui_widgets.o
 OBJECTS += $(OBJDIR)/ray.o
 OBJECTS += $(OBJDIR)/raytracer.o
 OBJECTS += $(OBJDIR)/shape.o
+OBJECTS += $(OBJDIR)/skybox.o
 
 # Rules
 # #############################################
@@ -179,6 +181,9 @@ $(OBJDIR)/raytracer.o: source/src/raytracer.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/shape.o: source/src/shape.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/skybox.o: source/src/skybox.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

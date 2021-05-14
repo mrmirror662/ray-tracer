@@ -11,17 +11,23 @@ static bool operator<(const glm::vec3 &a, const glm::vec3 &b)
 {
     return (glm::dot(a, a) < glm::dot(b, b));
 }
-glm::vec3 skyBox(ray &r)
+
+void rayTracer::initAll(camera &cam)
 {
-    using namespace glm;
-    auto b_val = dot(r.dir, vec3(1.f, 0.f, 0.f));
-    if (b_val < 0.f)
-    {
-        return vec3(.0f, 0.0f, 0.0f);
-    }
-    //return normalize(vec3(0.f, 0, b_val / 2));
-    return {0.f, 0.f, 0.f};
+    initRays(cam);
 }
+
+// glm::vec3 skyBox(ray &r)
+// {
+//     using namespace glm;
+//     auto b_val = dot(r.dir, vec3(1.f, 0.f, 0.f));
+//     if (b_val < 0.f)
+//     {
+//         return vec3(.0f, 0.0f, 0.0f);
+//     }
+//     //return normalize(vec3(0.f, 0, b_val / 2));
+//     return {0.f, 0.f, 0.f};
+// }
 struct intersect_info
 {
     float t;
@@ -29,7 +35,7 @@ struct intersect_info
     uint t_index;
     uint m_index;
 };
-glm::vec3 rayTracer::trace_tris_impl(ray &r, std::vector<mesh> &meshes)
+glm::vec3 rayTracer::trace_meshes_impl(ray &r, std::vector<mesh> &meshes, SkyBox *sb)
 {
     using namespace glm;
     std::vector<intersect_info> intersections;
@@ -52,7 +58,7 @@ glm::vec3 rayTracer::trace_tris_impl(ray &r, std::vector<mesh> &meshes)
     }
     if (intersections.size() == 0)
     {
-        return skyBox(r);
+        return sb->SampleSkyBox(r);
     }
     intersect_info min = {CLIP_DISTANCE, vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
     for (auto intersection : intersections)
@@ -69,10 +75,10 @@ glm::vec3 rayTracer::trace_tris_impl(ray &r, std::vector<mesh> &meshes)
     auto bright = abs(dot(raytointer, norm));
     auto col = bright * triHit.col;
     int bouceLeft = 6;
-    glm::vec3 f_col = (col + trace_tris_impl(r_new, meshes, col, bouceLeft - 1)) / 2.f;
+    glm::vec3 f_col = (col + trace_meshes_impl(r_new, meshes, sb, col, bouceLeft - 1)) / 2.f;
     return f_col;
 }
-glm::vec3 rayTracer::trace_tris_impl(ray r, std::vector<mesh> &meshes, glm::vec3 b_col, int bouceLeft)
+glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox *sb, glm::vec3 b_col, int bouceLeft)
 {
     if (bouceLeft == 0)
         return b_col;
@@ -97,7 +103,7 @@ glm::vec3 rayTracer::trace_tris_impl(ray r, std::vector<mesh> &meshes, glm::vec3
     }
     if (intersections.size() == 0)
     {
-        return skyBox(r);
+        return sb->SampleSkyBox(r);
     }
     intersect_info min = {CLIP_DISTANCE, vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
     for (auto intersection : intersections)
@@ -113,15 +119,15 @@ glm::vec3 rayTracer::trace_tris_impl(ray r, std::vector<mesh> &meshes, glm::vec3
     ray r_new(min.pos, reflect_dir);
     auto bright = abs(dot(raytointer, norm));
     auto col = ((bright * triHit.col) + (b_col / 1.f)) / 2.f;
-    glm::vec3 f_col = (col + trace_tris_impl(r_new, meshes, col, bouceLeft - 1)) / 2.f;
+    glm::vec3 f_col = (col + trace_meshes_impl(r_new, meshes, sb, col, bouceLeft - 1)) / 2.f;
     return f_col;
 }
-void rayTracer::trace_work(int start, int end, frameBuff *displayFrame, std::vector<mesh> *meshes, camera *cam)
+void rayTracer::trace_work(int start, int end, frameBuff *displayFrame, std::vector<mesh> *meshes, SkyBox *sb, camera *cam)
 {
     for (int i = start; i >= end; i--)
     {
         auto r = cam->rays[i];
-        auto traced = trace_tris_impl(r, *meshes);
+        auto traced = trace_meshes_impl(r, *meshes, sb);
         displayFrame->pushRGBPixel(
             i,
             (ub)(traced.r * 255.0f),
@@ -129,7 +135,7 @@ void rayTracer::trace_work(int start, int end, frameBuff *displayFrame, std::vec
             (ub)(traced.b * 255.0f));
     }
 }
-std::vector<std::thread> rayTracer::trace_tris(camera *cam, std::vector<mesh> *meshes, frameBuff *displayFrame)
+std::vector<std::thread> rayTracer::trace_tris(camera *cam, std::vector<mesh> *meshes, SkyBox *sb, frameBuff *displayFrame)
 {
     int raysLength = cam->rays.size();
     int cores = std::thread::hardware_concurrency();
@@ -147,7 +153,7 @@ std::vector<std::thread> rayTracer::trace_tris(camera *cam, std::vector<mesh> *m
                 startIndex,
                 std::max(startIndex - dividedRays, 0),
                 displayFrame,
-                meshes,
+                meshes, sb,
                 cam));
         startIndex -= (dividedRays + 1);
     }

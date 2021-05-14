@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include "glu.h"
 #include "buff_view.h"
 #include <iostream>
@@ -10,6 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <chrono>
 #include <mutex>
+#include "skybox.h"
+#define STBI_IMPLEMENTATION
 class Timer
 {
 private:
@@ -36,8 +40,8 @@ void ppm(frameBuff &buff)
     for (int i = 0; i < buff.data.size(); i++)
         os << buff[i];
 }
-const int w = 500, h = 500;
-const int windw = 500, windh = 500;
+const int w = 1920, h = 1080;
+const int windw = 1920, windh = 1080;
 int main()
 {
     using namespace std;
@@ -48,13 +52,13 @@ int main()
 
     triangle t();
     cam.resolutionFactor = 1;
-    rayTracer::initRays(cam);
+    rayTracer::initAll(cam);
     rayTracer rt;
     mesh deer1;
     mesh deer2;
 
     deer1.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
-    deer2.loadFromObj("asset/deer.obj", {0.f, 1.f, 0.f});
+    deer2.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
     for (auto &t : deer2.tris)
     {
         glm::vec3 offset = {0.f, 0.f, 750.f};
@@ -73,19 +77,19 @@ int main()
     std::vector<mesh> meshes;
     meshes.push_back(deer1);
     meshes.push_back(deer2);
+    SkyBox skybox("asset/sb2.jpg");
     frameBuff buff(cam.w * cam.resolutionFactor, cam.h * cam.resolutionFactor, cam.c);
-
     int buffWidth = buff.getW();
     int buffHeight = buff.getH();
 
-    std::thread rt_thread([](camera *cam, std::vector<mesh> *meshes, frameBuff *buff) {
-        auto threads = rayTracer::trace_tris(cam, meshes, buff);
+    std::thread rt_thread([](camera *cam, std::vector<mesh> *meshes, SkyBox *sb, frameBuff *buff) {
+        auto threads = rayTracer::trace_tris(cam, meshes, sb, buff);
         for (int i = 0; i < threads.size(); i++)
         {
             threads[i].join();
         }
     },
-                          &cam, &meshes, &buff);
+                          &cam, &meshes, &skybox, &buff);
     while (!glfwWindowShouldClose(window))
     {
 
