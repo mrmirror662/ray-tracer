@@ -40,8 +40,8 @@ void ppm(frameBuff &buff)
     for (int i = 0; i < buff.data.size(); i++)
         os << buff[i];
 }
-const int w = 1920, h = 1080;
-const int windw = 1920, windh = 1080;
+const int w = 500, h = 500;
+const int windw = 500, windh = 500;
 int main()
 {
     using namespace std;
@@ -57,8 +57,10 @@ int main()
     mesh deer1;
     mesh deer2;
 
-    deer1.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
+    deer1.loadFromObj("asset/deer.obj", {1.f, 0.46f, 0.43f});
     deer2.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
+    deer1.reflectivity = 0.001;
+    deer2.reflectivity = 0.9;
     for (auto &t : deer2.tris)
     {
         glm::vec3 offset = {0.f, 0.f, 750.f};
@@ -67,6 +69,7 @@ int main()
         t.v3 += offset;
     }
     auto window = initGLW(windw, windh);
+    glfwSwapInterval(1);
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -135,5 +138,7 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    rt_thread.join();
+
     return 0;
 }

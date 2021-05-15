@@ -2,6 +2,12 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <string>
+enum class MatType
+{
+    Metallic,
+    Plastic,
+    Dielectric
+};
 struct triangle
 {
 
@@ -22,6 +28,10 @@ struct triangle
 };
 struct mesh
 {
+    MatType SurfaceType;
     std::vector<triangle> tris;
+    float reflectivity;
+    mesh() : SurfaceType(MatType::Metallic){};
+    mesh(MatType type) : SurfaceType(type){};
     bool loadFromObj(std::string filePath, glm::vec3 col);
 };

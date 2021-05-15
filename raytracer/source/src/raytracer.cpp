@@ -35,9 +35,18 @@ struct intersect_info
     uint t_index;
     uint m_index;
 };
-glm::vec3 rayTracer::trace_meshes_impl(ray &r, std::vector<mesh> &meshes, SkyBox *sb)
+intersect_info FindMin(std::vector<intersect_info> intersections)
 {
-    using namespace glm;
+    intersect_info min = {CLIP_DISTANCE, glm::vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
+    for (auto intersection : intersections)
+    {
+        if (intersection.t < min.t)
+            min = intersection;
+    }
+    return min;
+}
+std::vector<intersect_info> GetIntersects(ray &r, std::vector<mesh> &meshes)
+{
     std::vector<intersect_info> intersections;
     uint m_counter = 0;
     for (auto &m : meshes)
@@ -56,72 +65,65 @@ glm::vec3 rayTracer::trace_meshes_impl(ray &r, std::vector<mesh> &meshes, SkyBox
         }
         m_counter++;
     }
-    if (intersections.size() == 0)
-    {
-        return sb->SampleSkyBox(r);
-    }
-    intersect_info min = {CLIP_DISTANCE, vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
-    for (auto intersection : intersections)
-    {
-        if (intersection.t < min.t)
-            min = intersection;
-    }
-    auto raytointer = min.pos - r.origin;
-    raytointer = glm::normalize(raytointer);
-    auto triHit = meshes[min.m_index].tris[min.t_index];
-    auto norm = glm::normalize(triHit.normal);
-    auto reflect_dir = glm::reflect(r.dir, -norm);
-    ray r_new(min.pos, reflect_dir);
-    auto bright = abs(dot(raytointer, norm));
-    auto col = bright * triHit.col;
-    int bouceLeft = 6;
-    glm::vec3 f_col = (col + trace_meshes_impl(r_new, meshes, sb, col, bouceLeft - 1)) / 2.f;
-    return f_col;
+    return intersections;
 }
-glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox *sb, glm::vec3 b_col, int bouceLeft)
+glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox *sb)
 {
-    if (bouceLeft == 0)
-        return b_col;
-    using namespace glm;
-    std::vector<intersect_info> intersections;
-    uint m_counter = 0;
-    for (auto &m : meshes)
-    {
-        uint t_counter = 0;
-        for (auto &t : m.tris)
-        {
-            float t_t;
-            glm::vec3 pos_t;
-            if (r.doesIntersect(t, t_t, pos_t))
-            {
 
-                intersections.push_back({t_t, pos_t, t_counter, m_counter});
+    using namespace glm;
+    glm::vec3 f_col = {-1.f, -1.f, -1.f};
+    int bouceLeft = 32;
+    size_t intersection_size;
+    mesh *pm;
+    std::vector<std::pair<glm::vec3, mesh *>> reflectionPassData;
+    reflectionPassData.reserve(bouceLeft);
+    while (bouceLeft--)
+    {
+        auto intersections = GetIntersects(r, meshes);
+        intersect_info min = FindMin(intersections);
+        if (intersections.size() == 0)
+        {
+            if (f_col.x < 0.f)
+            {
+                return sb->SampleSkyBox(r);
             }
-            t_counter++;
+            else
+            {
+                //f_col = glm::mix(f_col, sb->SampleSkyBox(r), pm->reflectivity);
+                reflectionPassData.push_back({sb->SampleSkyBox(r), pm});
+            }
+            break;
         }
-        m_counter++;
+        auto raytointer = min.pos - r.origin;
+        raytointer = glm::normalize(raytointer);
+        auto triHit = meshes[min.m_index].tris[min.t_index];
+        auto norm = glm::normalize(triHit.normal);
+        auto reflect_dir = glm::reflect(r.dir, -norm);
+        ray r_new(min.pos, reflect_dir);
+        auto bright = clamp(dot(r.dir, norm), 0.f, 1.f);
+        auto col = (bright * triHit.col);
+        if (f_col.x < 0.f)
+        {
+            f_col = col;
+        }
+        else
+        {
+            reflectionPassData.push_back({col, &meshes[min.m_index]});
+        }
+        r = r_new;
+        pm = &meshes[min.m_index];
     }
-    if (intersections.size() == 0)
+    while (reflectionPassData.size() != 0)
     {
-        return sb->SampleSkyBox(r);
+        auto [temp_col, mesh_ptr] = reflectionPassData.back();
+
+        reflectionPassData.pop_back();
+        f_col = glm::mix(f_col, temp_col, mesh_ptr->reflectivity);
     }
-    intersect_info min = {CLIP_DISTANCE, vec3(CLIP_DISTANCE, CLIP_DISTANCE, CLIP_DISTANCE), 0};
-    for (auto intersection : intersections)
-    {
-        if (intersection.t < min.t)
-            min = intersection;
-    }
-    auto raytointer = min.pos - r.origin;
-    raytointer = glm::normalize(raytointer);
-    auto triHit = meshes[min.m_index].tris[min.t_index];
-    auto norm = glm::normalize(triHit.normal);
-    auto reflect_dir = glm::reflect(r.dir, norm);
-    ray r_new(min.pos, reflect_dir);
-    auto bright = abs(dot(raytointer, norm));
-    auto col = ((bright * triHit.col) + (b_col / 1.f)) / 2.f;
-    glm::vec3 f_col = (col + trace_meshes_impl(r_new, meshes, sb, col, bouceLeft - 1)) / 2.f;
+
     return f_col;
 }
+
 void rayTracer::trace_work(int start, int end, frameBuff *displayFrame, std::vector<mesh> *meshes, SkyBox *sb, camera *cam)
 {
     for (int i = start; i >= end; i--)

@@ -14,6 +14,6 @@ public:
     void trace(const camera &, std::vector<mesh> &, frameBuff *);
 
 private:
-    static glm::vec3 trace_meshes_impl(ray &, std::vector<mesh> &, SkyBox *sb);
+    static glm::vec3 trace_meshes_impl(ray, std::vector<mesh> &, SkyBox *sb);
     static glm::vec3 trace_meshes_impl(ray, std::vector<mesh> &, SkyBox *sb, glm::vec3, int);
 };
