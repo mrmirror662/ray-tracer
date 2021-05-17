@@ -3,8 +3,14 @@
         "myDefaultIncludePath": [
             "${workspaceFolder}/raytracer/source/includes/"
         ],
+        "vendor": [
+            "${workspaceFolder}/raytracer/source/vendor"
+        ],
         "imgui": [
-            "${workspaceFolder}/raytracer/source/imgui/"
+            "${workspaceFolder}/raytracer/source/vendor/imgui"
+        ],
+        "fast_obj": [
+            "${workspaceFolder}/raytracer/source/vendor/obj_loader"
         ],
         "myCompilerPath": "/usr/local/bin/gcc-7"
     },
@@ -13,10 +19,12 @@
             "name": "Linux",
             "includePath": [
                 "${myDefaultIncludePath}",
-                "${imgui}"
+                "${imgui}",
+                "${fast_obj}",
+                "${workspaceFolder}/raytracer/source/vendor/stb_image"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang-11",
+            "compilerPath": "/usr/bin/g++",
             "intelliSenseMode": "macos-gcc-x64"
         }
     ],

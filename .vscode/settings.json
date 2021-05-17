@@ -1,5 +1,12 @@
 {
     "files.associations": {
-        "thread": "cpp"
+        "thread": "cpp",
+        "*.tcc": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "utility": "cpp"
     }
 }

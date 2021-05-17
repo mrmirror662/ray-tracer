@@ -40,8 +40,8 @@ void ppm(frameBuff &buff)
     for (int i = 0; i < buff.data.size(); i++)
         os << buff[i];
 }
-const int w = 500, h = 500;
-const int windw = 500, windh = 500;
+const int w = 400, h = 400;
+const int windw = 400, windh = 400;
 int main()
 {
     using namespace std;
@@ -56,17 +56,29 @@ int main()
     rayTracer rt;
     mesh deer1;
     mesh deer2;
+    mesh deer3;
 
     deer1.loadFromObj("asset/deer.obj", {1.f, 0.46f, 0.43f});
     deer2.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
-    deer1.reflectivity = 0.001;
-    deer2.reflectivity = 0.9;
+    deer3.loadFromObj("asset/deer.obj", {1.f, 1.f, 1.f});
+
+    deer1.absorption = 0.7f;
+    deer2.absorption = 0.3f;
+    deer3.absorption = 0.7f;
+
     for (auto &t : deer2.tris)
     {
         glm::vec3 offset = {0.f, 0.f, 750.f};
         t.v1 += offset;
         t.v2 += offset;
         t.v3 += offset;
+    }
+    for (auto &t : deer3.tris)
+    {
+        glm::vec3 offset = {0.f, 0.f, 750.f};
+        t.v1 -= offset;
+        t.v2 -= offset;
+        t.v3 -= offset;
     }
     auto window = initGLW(windw, windh);
     glfwSwapInterval(1);
@@ -80,6 +92,7 @@ int main()
     std::vector<mesh> meshes;
     meshes.push_back(deer1);
     meshes.push_back(deer2);
+    meshes.push_back(deer3);
     SkyBox skybox("asset/sb2.jpg");
     frameBuff buff(cam.w * cam.resolutionFactor, cam.h * cam.resolutionFactor, cam.c);
     int buffWidth = buff.getW();

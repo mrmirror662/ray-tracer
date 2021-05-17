@@ -71,7 +71,7 @@ glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox 
 {
 
     using namespace glm;
-    glm::vec3 f_col = {-1.f, -1.f, -1.f};
+    bool firstIterDone = false;
     int bouceLeft = 32;
     size_t intersection_size;
     mesh *pm;
@@ -83,14 +83,15 @@ glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox 
         intersect_info min = FindMin(intersections);
         if (intersections.size() == 0)
         {
-            if (f_col.x < 0.f)
+            if (!firstIterDone)
             {
                 return sb->SampleSkyBox(r);
             }
             else
             {
-                //f_col = glm::mix(f_col, sb->SampleSkyBox(r), pm->reflectivity);
+                //f_col = glm::mix(f_col, sb->SampleSkyBox(r), pm->absorption);
                 reflectionPassData.push_back({sb->SampleSkyBox(r), pm});
+                firstIterDone = true;
             }
             break;
         }
@@ -102,9 +103,10 @@ glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox 
         ray r_new(min.pos, reflect_dir);
         auto bright = clamp(dot(r.dir, norm), 0.f, 1.f);
         auto col = (bright * triHit.col);
-        if (f_col.x < 0.f)
+        if (!firstIterDone)
         {
-            f_col = col;
+            reflectionPassData.push_back({col, &meshes[min.m_index]});
+            firstIterDone = true;
         }
         else
         {
@@ -113,12 +115,22 @@ glm::vec3 rayTracer::trace_meshes_impl(ray r, std::vector<mesh> &meshes, SkyBox 
         r = r_new;
         pm = &meshes[min.m_index];
     }
+    glm::vec3 f_col;
+    bool reflectionFirstIterDone = false;
     while (reflectionPassData.size() != 0)
     {
         auto [temp_col, mesh_ptr] = reflectionPassData.back();
 
         reflectionPassData.pop_back();
-        f_col = glm::mix(f_col, temp_col, mesh_ptr->reflectivity);
+        if (!reflectionFirstIterDone)
+        {
+            f_col = temp_col;
+            reflectionFirstIterDone = true;
+        }
+        else
+        {
+            f_col = glm::mix(f_col, temp_col, mesh_ptr->absorption);
+        }
     }
 
     return f_col;

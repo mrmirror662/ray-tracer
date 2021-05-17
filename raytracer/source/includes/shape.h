@@ -30,7 +30,7 @@ struct mesh
 {
     MatType SurfaceType;
     std::vector<triangle> tris;
-    float reflectivity;
+    float absorption;
     mesh() : SurfaceType(MatType::Metallic){};
     mesh(MatType type) : SurfaceType(type){};
     bool loadFromObj(std::string filePath, glm::vec3 col);

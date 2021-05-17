@@ -7,8 +7,8 @@ project "raytracer"
     language "C++"
     cppdialect "C++17"
     targetdir "lib/%{cfg.buildcfg}"
-    files {"source/src/**.cpp","source/imgui/**.cpp"}
-    includedirs {"source/includes/","source/imgui/"}
+    files {"source/src/**.cpp","source/vendor/imgui/**.cpp"}
+    includedirs {"source/includes/","source/vendor/imgui/","source/vendor/stb_image/","source/vendor/obj_loader/"}
     links {"glfw","GLU","GL","GLEW","pthread"}
     filter "configurations:debug"
         defines{"DEBUG"}

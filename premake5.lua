@@ -9,7 +9,8 @@ project "app"
     cppdialect "C++17"
     targetdir ""
     files {"app.cpp"}
-    includedirs {"raytracer/source/includes","raytracer/source/imgui"  }
+    raytracer_dir = "raytracer/"
+    includedirs {"%{raytracer_dir}source/includes","raytracer/source/vendor/imgui","%{raytracer_dir}source/vendor/stb_image/","%{raytracer_dir}source/vendor/obj_loader/"}
     links{"raytracer","GL","glfw","GLEW","GLU","pthread"}
     include "raytracer/"
     filter "configurations:debug"
